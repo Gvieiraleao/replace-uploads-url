@@ -7,58 +7,73 @@
  * Version:     0.1.0
  */
 if ( ! defined( 'ABSPATH' ) ) {
-	exit(0);
+    exit(0);
+}
+
+if ( ! defined( 'WP_PRODUCTION_URL' ) ) {
+    return;
 }
 
 final class Replace_Uploads_Url {
 
-	private static $instance = null;
+    private static $instance = null;
 
-	private function __construct() {
-		if ( ! defined( 'WP_PRODUCTION_URL' ) ) {
-		 	return;
-		}
+    public $production_url;
 
-		add_action( 'wp_get_attachment_url', array( &$this, 'attachment_url' ) );
-		add_action( 'wp_calculate_image_srcset', array( &$this, 'image_srcset' ), 10, 5 );
-	}
+    private function __construct() {
+    	$this->set_production_url();
 
-	protected function _get_uri( $url ) {
-		$regex = ( false === strpos( $url, 'localhost' ) ) ? '' : '.+?\/';
-		$uri   = preg_replace( "/(https?:\/\/.+?\/{$regex})/", '', $url );
+        add_action( 'wp_get_attachment_url', array( $this, 'image_url' ) );
+        add_action( 'wp_calculate_image_srcset', array( $this, 'image_srcset' ), 10, 5 );
+    }
 
-		if ( file_exists( ABSPATH . $uri ) ) {
-			return false;
-		}
+    public function set_production_url() {
+    	$this->production_url = untrailingslashit( WP_PRODUCTION_URL );
+    }
 
-		return $uri;
-	}
+    public function indexof( $value, $search ) {
+        return ( false !== strpos( $value, $search ) );
+    }
 
-	public function attachment_url( $url ) {
-		if ( ! $uri = $this->_get_uri( $url ) ) {
-			return $url;
-		}
+    public function remove_home_url( $url ) {
+        return str_replace( home_url( '/' ), '', $url );
+    }
 
-		return sprintf( '%s/%s', WP_PRODUCTION_URL, $uri );
-	}
+    public function get_uri( $url ) {
+        $uri = $this->remove_home_url( $url );
 
-	public function image_srcset( $sources, $size_array, $image_src, $image_meta, $attachment_id ) {
-		foreach ( $sources as $key => $source ) :
-			if ( ! $uri = $this->_get_uri( $source['url'] ) ) {
-				continue;
-			}
+        if ( file_exists( ABSPATH . $uri ) ) {
+            return false;
+        }
 
-			$source['url']   = sprintf( '%s/%s', WP_PRODUCTION_URL, $uri );
-			$sources[ $key ] = $source;
-		endforeach;
+        return $uri;
+    }
 
-		return $sources;
-	}
+    public function image_url( $url ) {
+        if ( ! $uri = $this->get_uri( $url ) ) {
+            return $url;
+        }
 
-	public static function instance() {
-		if ( is_null( self::$instance ) ) {
-			self::$instance = new self;
-		}
-	}
+        return sprintf( '%s/%s', $this->production_url, $uri );
+    }
+
+    public function image_srcset( $sources, $size_array, $image_src, $image_meta, $attachment_id ) {
+        foreach ( $sources as $key => $source ) :
+            if ( ! $uri = $this->get_uri( $source['url'] ) ) {
+                continue;
+            }
+
+            $source['url']   = sprintf( '%s/%s', $this->production_url, $uri );
+            $sources[ $key ] = $source;
+        endforeach;
+
+        return $sources;
+    }
+
+    public static function instance() {
+        if ( is_null( self::$instance ) ) {
+            self::$instance = new self;
+        }
+    }
 }
 add_action( 'plugins_loaded', array( 'Replace_Uploads_Url', 'instance' ) );
