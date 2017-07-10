@@ -4,7 +4,7 @@
  * Plugin URI:  https://github.com/victorfreitas/replace-uploads-url
  * Description: Replace uploads site URL on localhost to production
  * Author:      Victor Freitas
- * Version:     0.1.0
+ * Version:     0.1.1
  */
 if ( ! defined( 'ABSPATH' ) ) {
     exit(0);
@@ -36,7 +36,7 @@ final class Replace_Uploads_Url {
     }
 
     public function remove_home_url( $url ) {
-        return str_replace( home_url( '/' ), '', $url );
+        return preg_replace( '/https?:\/\/(localhost)?.+?\//', '', $url );
     }
 
     public function get_uri( $url ) {
@@ -76,4 +76,4 @@ final class Replace_Uploads_Url {
         }
     }
 }
-add_action( 'plugins_loaded', array( 'Replace_Uploads_Url', 'instance' ) );
+add_action( 'plugins_loaded', array( 'Replace_Uploads_Url', 'instance' ), 0 );
