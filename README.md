@@ -1,8 +1,8 @@
 # Replace Uploads URL
 Author URL: https://github.com/victorfreitas  
 Contributors: victorfreitas  
-Tested up to: 4.6.1  
-Stable tag: 0.0.1  
+Tested up to: 4.8  
+Stable tag: 0.2  
 
 ## Description
 
