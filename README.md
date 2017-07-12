@@ -10,5 +10,4 @@ Replace uploads site URL on localhost to production
 
 ## Installation
 
-Add the constant below in your wp-config.php  
-define( 'WP_PRODUCTION_URL', 'http://your-production-url.com' );
+Open menu Settings -> General -> Replace Uploads URL Section
