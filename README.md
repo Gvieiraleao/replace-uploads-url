@@ -2,7 +2,7 @@
 Author URL: https://github.com/victorfreitas  
 Contributors: victorfreitas  
 Tested up to: 4.8  
-Stable tag: 0.2  
+Stable tag: 0.3  
 
 ## Description
 
