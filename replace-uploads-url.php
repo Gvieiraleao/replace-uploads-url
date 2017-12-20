@@ -40,7 +40,6 @@ final class Replace_Uploads_Url {
         }
 
         add_action( 'wp_loaded', array( $this, 'begin' ) );
-        add_action( 'shutdown', array( $this, 'end' ) );
     }
 
     public function begin() {
@@ -69,10 +68,6 @@ final class Replace_Uploads_Url {
         endforeach;
 
         return $content;
-    }
-
-    public function end() {
-        ob_end_flush();
     }
 
     public function set_production_url() {
